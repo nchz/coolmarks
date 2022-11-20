@@ -24,14 +24,14 @@ Built with [Django](https://www.djangoproject.com/), [REST Framework](https://ww
 
 ## Models
 
-### Item
+### Bookmark
 
-An object that represents a saved link. The only required value to create an Item is the URL to be stored. Some fields are automatically calculated. The fields are:
+An object that represents a saved link. The only required value to create a Bookmark is the URL to be stored. Some fields are automatically calculated. The fields are:
 - owner (fk)
+- dt (auto)
 - link
 - domain (auto)
 - title (auto)
-- dt (auto)
 - tags (fks, optional)
 
 
@@ -39,4 +39,4 @@ An object that represents a saved link. The only required value to create an Ite
 
 Simple, few-word descriptive labels that may be related to one or more Items. New rows in this table may be created by any user. Tags are shared across users (it reduces the amount of data). The fields:
 - label
-- items (fks)
+- bookmarks (fks)

@@ -7,6 +7,6 @@ data/
 logs/
 
 misc/
-**/migrations/
+migrations/
 
 .DS_Store
