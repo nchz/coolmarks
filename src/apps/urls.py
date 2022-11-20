@@ -5,7 +5,7 @@ import apps.loader.views
 
 
 router = DefaultRouter()
-router.register("bookmark", apps.loader.views.BookmarkViewSet)
+router.register("bookmark", apps.loader.views.BookmarkViewSet, basename="bookmark")
 
 urlpatterns = [
     path("", include(router.urls)),
