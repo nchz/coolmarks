@@ -2,3 +2,5 @@ Django
 djangorestframework
 gevent
 gunicorn
+lxml
+requests

@@ -1,6 +1,13 @@
+from urllib.parse import urlparse
+
+import requests
+from lxml import etree
 from django.contrib.auth.models import User
 from django.db import models
 from rest_framework import serializers
+
+
+MAX_LENGTH = 200
 
 
 class Bookmark(models.Model):
@@ -16,11 +23,11 @@ class Bookmark(models.Model):
     link = models.URLField()
     domain = models.CharField(
         editable=False,
-        max_length=100,
+        max_length=MAX_LENGTH,
     )
     title = models.CharField(
         editable=False,
-        max_length=300,
+        max_length=MAX_LENGTH,
     )
 
 
@@ -32,3 +39,26 @@ class BookmarkSerializer(serializers.ModelSerializer):
             "id",
             "owner",
         )
+
+    def create(self, validated_data):
+        link = validated_data["link"]
+
+        # process link to get required values.
+        domain = urlparse(link).netloc[:MAX_LENGTH]
+
+        r = requests.get(link)
+        tree = etree.fromstring(r.text, parser=etree.HTMLParser())
+        try:
+            title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
+        except IndexError:
+            title = "NO TITLE"
+
+        # create and return object.
+        bookmark = Bookmark(
+            owner=validated_data["owner"],
+            link=link,
+            domain=domain,
+            title=title,
+        )
+        bookmark.save()
+        return bookmark
