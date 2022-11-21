@@ -6,6 +6,7 @@ from apps.loader.models import Bookmark, BookmarkSerializer
 class BookmarkViewSet(viewsets.ModelViewSet):
     serializer_class = BookmarkSerializer
     permission_classes = [permissions.IsAuthenticated]
+    template_name = "loader/bookmark.html"
 
     def get_queryset(self):
         queryset = Bookmark.objects.filter(owner=self.request.user)
