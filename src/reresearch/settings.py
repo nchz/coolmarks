@@ -16,6 +16,14 @@ STATIC_ROOT = BASE_DIR / "collectstatic"
 LOGIN_REDIRECT_URL = "/api/bookmarks.html"
 LOGOUT_REDIRECT_URL = "/"
 
+# allauth.
+ACCOUNT_LOGOUT_ON_GET = True
+
+# AUTHENTICATION_BACKENDS = (
+#     "django.contrib.auth.backends.ModelBackend",
+#     "allauth.account.auth_backends.AuthenticationBackend",
+# )
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -24,9 +32,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # dependencies
+    # dependencies.
     "rest_framework",
-    # project apps
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # "allauth.socialaccount.providers.google",
+    # project apps.
     "apps.loader",
 ]
 
