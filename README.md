@@ -1,25 +1,25 @@
 # Reresearch
 
-Browser bookmarks ain't enough.
+Evolving browser bookmarks.
 
 
 ### What?
 
-Inspired by traditional bookmarks from common web browsers, Reresearch offers extra features to keep the saved links organized, allowing to easily find them again when needed.
+Reresearch is a tool that allows you to save relevant web links and easily organize them to find the one you need, the moment you need it. Traditional bookmarks from web browser are still the best choice for those common websites that you want to access quickly.
 
 
 ### Why?
 
-When I do intensive web surfing to research and learn about a software library, or when I'm reading interesting news about astronomy, or genetics, I often end up with lots of tabs open in my web browser and it becomes hard to organize them. An easy exit is to save all the tabs in a folder, but then it's not funny to browse a messed up bag of links.
+When I do intensive web surfing to research and learn about a new software library, or whatever, I often end up with lots of tabs open in my web browser and it becomes hard to keep track of them. An easy exit is to save all the tabs in a folder, but then it's not funny to browse a messed up bag of links.
 
-Sometimes I find myself researching my own bookmarks collected during some research, trying to figure out which of them is that one I remember I found, say, a month ago. The *re-research* process would be easier keeping some metadata, like date added, and adding custom tags to categorize the links.
+Sometimes I find myself researching my own bookmarks collected during some research, trying to figure out which of them is that one I remember I found, say, a month ago. The re-research process would be easier using some metadata, like date added, and tagging the links to categorize them.
 
 
 ### How?
 
 Reresearch consists of a simple web API that receives the links of interest from the users and stores the appropriate data, and a web dashboard to interact with the collected items.
 
-Built with [Django](https://www.djangoproject.com/), [REST Framework](https://www.django-rest-framework.org/) and a bunch of plugins.
+It's built with [Django](https://www.djangoproject.com/), [REST Framework](https://www.django-rest-framework.org/) and a bunch of plugins.
 
 
 ## Models

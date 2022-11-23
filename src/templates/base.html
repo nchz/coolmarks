@@ -1,0 +1,51 @@
+<html>
+
+<head>
+  <link href="https://bootswatch.com/5/darkly/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="https://bootswatch.com/5/flatly/bootstrap.min.css" rel="stylesheet"> -->
+
+  <style>
+    :root {
+      --top-width: 90px;
+      --main-color: #333;
+    }
+
+    body {
+      margin: var(--top-width) 0px 0px 0px;
+    }
+
+    header {
+      position: fixed;
+      z-index: 100;
+      top: 0;
+      padding: 10px;
+      width: 100%;
+      height: var(--top-width);
+      box-sizing: border-box;
+      background-color: var(--main-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <a href="/">
+        <img height="100%" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Bootstrap_logo.svg">
+      </a>
+    </div>
+    <div>
+      <a href="#" class="btn btn-primary" style="width: 100px;">Signup</a>
+      <a href="#" class="btn btn-primary" style="width: 100px;">Login</a>
+    </div>
+  </header>
+  <main>
+    {% block body_main %}
+    {% endblock %}
+  </main>
+</body>
+
+</html>
