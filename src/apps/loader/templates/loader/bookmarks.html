@@ -2,7 +2,7 @@
 
 {% block body_main %}
 <div style="padding: 20px 20px 0px 20px;">
-  <form style="display: flex; justify-content: space-between;" action="/api/bookmark/" method="POST">
+  <form style="display: flex; justify-content: space-between;" action="/api/bookmarks/" method="POST">
     <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
     {% csrf_token %}
     <input type="text" name="link" style="margin: 0px 20px; width: 100%;">

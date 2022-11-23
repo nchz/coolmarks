@@ -7,7 +7,7 @@ from apps.loader.models import Bookmark, BookmarkSerializer
 class BookmarkViewSet(viewsets.ModelViewSet):
     serializer_class = BookmarkSerializer
     permission_classes = [permissions.IsAuthenticated]
-    template_name = "loader/bookmark.html"
+    template_name = "loader/bookmarks.html"
 
     def get_queryset(self):
         queryset = Bookmark.objects.filter(owner=self.request.user)
@@ -19,5 +19,5 @@ class BookmarkViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         if response.status_code == 201:
-            return HttpResponseRedirect("/api/bookmark.html")
+            return HttpResponseRedirect("/api/bookmarks.html")
         return response

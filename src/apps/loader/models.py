@@ -50,7 +50,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
         tree = etree.fromstring(r.text, parser=etree.HTMLParser())
         try:
             title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
-        except IndexError:
+        except (IndexError, TypeError):
             title = "NO TITLE"
 
         # create and return object.
