@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from rest_framework import viewsets, permissions
 
 from apps.loader.models import Bookmark, BookmarkSerializer
@@ -14,3 +15,9 @@ class BookmarkViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == 201:
+            return HttpResponseRedirect("/api/bookmark.html")
+        return response

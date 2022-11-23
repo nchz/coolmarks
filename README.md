@@ -17,7 +17,7 @@ Sometimes I find myself researching my own bookmarks collected during some resea
 
 ### How?
 
-Reresearch consists of a simple web API that receives the links of interest from the users and stores the appropriate data, and a web dashboard to interact with the collected items.
+Reresearch consists of a simple web API that receives the links of interest from the users to store the appropriate data, and a web dashboard to interact with the collected items.
 
 It's built with [Django](https://www.djangoproject.com/), [REST Framework](https://www.django-rest-framework.org/) and a bunch of plugins.
 
