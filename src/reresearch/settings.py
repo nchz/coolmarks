@@ -13,6 +13,9 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "collectstatic"
 # STATICFILES_DIRS = [BASE_DIR / "static"]
 
+LOGIN_REDIRECT_URL = "/api/bookmarks.html"
+LOGOUT_REDIRECT_URL = "/"
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
