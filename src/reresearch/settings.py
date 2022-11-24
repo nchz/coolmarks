@@ -17,8 +17,11 @@ LOGIN_REDIRECT_URL = "/api/bookmarks.html"
 LOGOUT_REDIRECT_URL = "/"
 
 # allauth.
+SITE_ID = 1
 ACCOUNT_LOGOUT_ON_GET = True
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+# TODO check if actually needed.
 # AUTHENTICATION_BACKENDS = (
 #     "django.contrib.auth.backends.ModelBackend",
 #     "allauth.account.auth_backends.AuthenticationBackend",
@@ -52,7 +55,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-SITE_ID = 1
 ROOT_URLCONF = "reresearch.urls"
 WSGI_APPLICATION = "reresearch.wsgi.application"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
