@@ -43,8 +43,21 @@ class Bookmark(models.Model):
     class Meta:
         ordering = ("-dt",)
 
+    def save(self, *args, **kwargs):
+        # fields aren't updated if `self.link` changes.
+        if not self.title:
+            # process link to get required values.
+            try:
+                r = requests.get(self.link)
+                tree = etree.fromstring(r.text, parser=etree.HTMLParser())
+                self.title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
+            except (requests.exceptions.ConnectionError, IndexError, TypeError):
+                self.title = "NO TITLE"
+            self.domain = urlparse(self.link).netloc[:MAX_LENGTH]
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"({self.owner.username}) {self.title}"
+        return f"{self.id} ({self.owner.username}) {self.title}"
 
 
 class BookmarkSerializer(serializers.ModelSerializer):
@@ -59,10 +72,10 @@ class BookmarkSerializer(serializers.ModelSerializer):
         model = Bookmark
         depth = 1
         fields = (
-            "id",
             "link",
             "tags_string",
             # read_only_fields
+            "id",
             "owner",
             "dt",
             "domain",
@@ -70,35 +83,33 @@ class BookmarkSerializer(serializers.ModelSerializer):
             "tags",
         )
 
+    def to_representation(self, instance):
+        r = super().to_representation(instance)
+        r["tags_string"] = "; ".join(t.label for t in instance.tags.all())
+        return r
+
     def create(self, validated_data):
-        link = validated_data["link"]
+        tags = self._get_tags(validated_data.pop("tags_string"))
+        instance = super().create(validated_data)
+        for tag in tags:
+            instance.tags.create(label=tag)
+        return instance
 
-        # process link to get required values.
-        try:
-            r = requests.get(link)
-            tree = etree.fromstring(r.text, parser=etree.HTMLParser())
-            title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
-        except (requests.exceptions.ConnectionError, IndexError, TypeError):
-            title = "NO TITLE"
+    def update(self, instance, validated_data):
+        tags = self._get_tags(validated_data.pop("tags_string"))
+        instance = super().update(instance, validated_data)
+        instance.tags.clear()
+        for tag in tags:
+            instance.tags.create(label=tag)
+        return instance
 
-        domain = urlparse(link).netloc[:MAX_LENGTH]
-
-        # create and return object.
-        bookmark = Bookmark(
-            owner=validated_data["owner"],
-            link=link,
-            domain=domain,
-            title=title,
-        )
-        bookmark.save()
-
-        if tags_string := validated_data["tags_string"]:
-            for tag in tags_string.split(";"):
-                # clean string and create tag (if any).
-                tag = re.sub(r"[\s|\-|_]+", "_", tag)
-                tag = re.sub(r"\W", "", tag)
-                tag = re.sub(r"_+", "_", tag).strip("_")
-                if tag:
-                    bookmark.tags.create(label=tag)
-
-        return bookmark
+    @staticmethod
+    def _get_tags(tags_string):
+        tags = set()
+        for tag in tags_string.split(";"):
+            tag = re.sub(r"[\s|\-|_]+", "_", tag)
+            tag = re.sub(r"\W", "", tag)
+            tag = re.sub(r"_+", "_", tag).strip("_").replace("_", "-")
+            if tag != "":
+                tags.add(tag)
+        return tags
