@@ -1,7 +1,8 @@
 from django.http import HttpResponseRedirect
 from rest_framework import viewsets, permissions
 
-from apps.loader.models import Bookmark, BookmarkSerializer
+from apps.loader.models import Bookmark
+from apps.loader.serializers import BookmarkSerializer
 
 
 class BookmarkViewSet(viewsets.ModelViewSet):
