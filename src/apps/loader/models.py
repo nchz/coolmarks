@@ -1,12 +1,18 @@
 from urllib.parse import urlparse
 
-import requests
-from lxml import etree
 from django.contrib.auth.models import User
 from django.db import models
 
+import requests
+from lxml import etree
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
 
 MAX_LENGTH = 200
+CHROMEDRIVER_PATH = "/src/chromedriver"
+driver_options = Options()
+driver_options.headless = True
 
 
 class Tag(models.Model):
@@ -48,11 +54,18 @@ class Bookmark(models.Model):
             try:
                 r = requests.get(self.link)
                 tree = etree.fromstring(r.text, parser=etree.HTMLParser())
-                self.title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
+                title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
             except (requests.exceptions.ConnectionError, IndexError, TypeError):
-                self.title = "NO TITLE"
+                driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=driver_options)
+                driver.get(self.link)
+                title = driver.title
+                driver.quit()
+            except Exception:
+                title = "NO TITLE"
+
+            self.title = title
             self.domain = urlparse(self.link).netloc[:MAX_LENGTH]
-        super().save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.id} ({self.owner.username}) {self.link} -- {self.title}"
