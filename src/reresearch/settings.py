@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ["*"]
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "collectstatic"
-# STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 LOGIN_REDIRECT_URL = "/api/bookmarks.html"
 LOGOUT_REDIRECT_URL = "/"
