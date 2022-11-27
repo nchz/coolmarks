@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
 {% block body_main %}
+
+{% if results is not None %}
+
 <div style="padding: 20px 20px 0px 20px;">
   <form style="display: flex; justify-content: space-between;" action="/api/bookmarks/" method="POST">
-    <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
     {% csrf_token %}
+    <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
     <input type="text" name="tags_string" style="width: 25%; margin: 0px 20px;" placeholder="tags; separated; by ;">
     <input type="url" name="link" style="width: 75%;" placeholder="http://example.com">
   </form>
@@ -33,4 +36,41 @@
     {% endfor %}
   </tbody>
 </table>
+
+{% else %}
+
+<div style="height: 100%; display: flex; align-items: center; justify-content: center;">
+  <table class="table table-hover" style="width: 50%; min-width: 300px;">
+    <tbody>
+      <tr>
+        <th>Date added</th>
+        <td>{{ dt | slice:":19" }}</td>
+      </tr>
+      <tr>
+        <th>Title</th>
+        <td>{{ title }}</td>
+      </tr>
+      <tr>
+        <th>Domain</th>
+        <td>{{ domain }}</td>
+      </tr>
+      <tr>
+        <th>Link</th>
+        <td><a href="{{ link }}" target="_blank">{{ link }}</a></td>
+      </tr>
+      <tr>
+        <th>Tags</th>
+        <td>
+          <form style="display: flex; justify-content: space-between;" action="/api/bookmarks/{{ id }}/" method="post">
+            {% csrf_token %}
+            <input type="text" name="tags_string" style="width: 100%; margin: 0px 5px;" placeholder="tags; separated; by ;" value="{{ tags_string }}">
+            <a href="javascript:alert('Not implemented yet')" class="btn btn-warning" style="padding: 5px 10px;">Edit?</a>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
 {% endblock %}

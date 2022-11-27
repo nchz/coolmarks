@@ -55,4 +55,4 @@ class Bookmark(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.id} ({self.owner.username}) {self.title}"
+        return f"{self.id} ({self.owner.username}) {self.link} -- {self.title}"
