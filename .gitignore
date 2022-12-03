@@ -5,6 +5,7 @@ __pycache__/
 collectstatic/
 data/
 logs/
+chromedriver
 
 misc/
 migrations/
