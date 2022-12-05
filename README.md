@@ -1,11 +1,11 @@
-# Reresearch
+# Coolmarks
 
 Evolving browser bookmarks.
 
 
 ### What?
 
-Reresearch is a tool that allows you to save relevant web links and easily organize them to find the one you need, the moment you need it. Traditional bookmarks from web browser are still the best choice for those common websites that you want to access quickly.
+Coolmarks is a tool that allows you to save relevant web links and easily organize them to find the one you need, the moment you need it. Traditional bookmarks from web browser are still the best choice for those common websites that you want to access quickly.
 
 
 ### Why?
@@ -17,19 +17,19 @@ Sometimes I find myself researching my own bookmarks collected during some resea
 
 ### How?
 
-Reresearch consists of a simple web API that receives the links of interest from the users to store the appropriate data, and a web dashboard to interact with the collected items.
+Coolmarks consists of a simple web API that receives the links of interest from the users to store the appropriate data, and a web dashboard to interact with the collected items.
 
-It's built with [Django](https://www.djangoproject.com/), [REST Framework](https://www.django-rest-framework.org/) and a bunch of plugins.
+It's built with [Django](https://www.djangoproject.com/) and a bunch of plugins.
 
 
 ## Models
 
-### Bookmark
+### Link
 
-An object that represents a saved link. The only required value to create a Bookmark is the URL to be stored. Some fields are automatically calculated. The fields are:
+An object that represents a saved link. The only required value to create a Link is the URL to be stored. Some fields are automatically calculated. The fields are:
 - owner (fk)
 - dt (auto)
-- link
+- location
 - domain (auto)
 - title (auto)
 - tags (fks, optional)
@@ -37,6 +37,6 @@ An object that represents a saved link. The only required value to create a Book
 
 ### Tag
 
-Simple, few-word descriptive labels that may be related to one or more Items. New rows in this table may be created by any user. Tags are shared across users (it reduces the amount of data). The fields:
-- label
-- bookmarks (fks)
+Simple, few-word descriptive labels that may be related to one or more Links. New rows in this table may be created by any user. Tags are shared across users (it reduces the amount of data). The fields:
+- name
+- link_set (fks)

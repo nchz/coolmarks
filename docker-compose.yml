@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nginx:
-    container_name: rr_nginx
+    container_name: cm_nginx
     image: nginx:1.23.1-alpine
     restart: always
     ports:
@@ -12,11 +12,11 @@ services:
       - ./conf/nginx:/etc/nginx/conf.d
       - ./logs/nginx:/var/log/nginx
     depends_on:
-      - rr_web
+      - cm_web
 
-  rr_web:
-    container_name: rr_web
-    image: reresearch
+  cm_web:
+    container_name: cm_web
+    image: coolmarks
     build: .
     restart: always
     env_file: .env
