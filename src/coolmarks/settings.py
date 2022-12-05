@@ -5,6 +5,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 DEBUG = True
 SECRET_KEY = "($39x(vd=1$1uc%nzq7!xrd*$uz0+0v*qsy2+3&oc&9#8q@^k3"
 ALLOWED_HOSTS = ["*"]
@@ -14,10 +16,10 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "collectstatic"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-LOGIN_REDIRECT_URL = "/api/bookmarks.html"
+LOGIN_REDIRECT_URL = "/links/"
 LOGOUT_REDIRECT_URL = "/"
 
-# allauth.
+# used by allauth.
 SITE_ID = 1
 ACCOUNT_LOGOUT_ON_GET = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -29,6 +31,8 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # )
 
 
+# Application definition
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -37,13 +41,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # dependencies.
-    "rest_framework",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     # "allauth.socialaccount.providers.google",
     # project apps.
-    "apps.loader",
+    "links",
 ]
 
 MIDDLEWARE = [
@@ -56,18 +59,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "reresearch.urls"
-WSGI_APPLICATION = "reresearch.wsgi.application"
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "data" / "db.sqlite3",
-    }
-}
-
+ROOT_URLCONF = "coolmarks.urls"
+WSGI_APPLICATION = "coolmarks.wsgi.application"
 
 TEMPLATES = [
     {
@@ -88,6 +81,22 @@ TEMPLATES = [
 ]
 
 
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "data" / "db.sqlite3",
+    }
+}
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Password validation
+# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 _VALIDATORS_PREFIX = "django.contrib.auth.password_validation"
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": f"{_VALIDATORS_PREFIX}.UserAttributeSimilarityValidator"},
@@ -97,32 +106,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Internationalization
+# https://docs.djangoproject.com/en/4.1/topics/i18n/
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
 
-REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 100,
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-        "rest_framework.renderers.TemplateHTMLRenderer",
-    ],
-}
-
+# production settings.
 
 if os.getenv("RR_ENV") == "prod":
     DEBUG = False
-    ALLOWED_HOSTS = ["reresearch.duckdns.org"]
-
-    REST_FRAMEWORK = {
-        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-        "PAGE_SIZE": 100,
-        "DEFAULT_RENDERER_CLASSES": [
-            "rest_framework.renderers.JSONRenderer",
-            "rest_framework.renderers.TemplateHTMLRenderer",
-        ],
-    }
+    ALLOWED_HOSTS = ["coolmarks.duckdns.org"]

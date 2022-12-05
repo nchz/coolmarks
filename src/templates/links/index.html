@@ -5,14 +5,14 @@
 {% if results is not None %}
 
 <div style="padding: 20px 20px 0px 20px;">
-  <form style="display: flex; justify-content: space-between;" action="/api/bookmarks/" method="POST">
+  <form style="display: flex; justify-content: space-between;" action="{% url 'list' %}" method="POST">
     {% csrf_token %}
     <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
     {% with results|first as first %}
     <input type="text" name="tags_string" style="width: 25%; margin: 0px 20px;" placeholder="tags; separated; by ;"
       value="{{ first.tags_string }}">
     {% endwith %}
-    <input type="url" name="link" style="width: 75%;" placeholder="http://example.com">
+    <input type="url" name="location" style="width: 75%;" placeholder="http://example.com">
   </form>
 </div>
 <table class="table table-hover">
@@ -25,14 +25,14 @@
     </tr>
   </thead>
   <tbody>
-    {% for bookmark in results %}
+    {% for link in results %}
     <tr>
-      <td>{{ bookmark.dt | slice:":19" }}</td>
-      <td><a href="{{ bookmark.link }}" target="_blank">{{ bookmark.title }}</a></td>
-      <td>{{ bookmark.domain }}</td>
+      <td>{{ link.dt | slice:":19" }}</td>
+      <td><a href="{{ link.location }}" target="_blank">{{ link.title }}</a></td>
+      <td>{{ link.domain }}</td>
       <td>
-        {% for tag in bookmark.tags %}
-        <span class="my-1 badge rounded-pill bg-primary">{{ tag.label }}</span>
+        {% for tag in link.tags %}
+        <span class="my-1 badge rounded-pill bg-primary">{{ tag.name }}</span>
         {% endfor %}
       </td>
     </tr>
@@ -58,13 +58,13 @@
         <td>{{ domain }}</td>
       </tr>
       <tr>
-        <th>Link</th>
-        <td><a href="{{ link }}" target="_blank">{{ link }}</a></td>
+        <th>Location</th>
+        <td><a href="{{ location }}" target="_blank">{{ location }}</a></td>
       </tr>
       <tr>
         <th>Tags</th>
         <td>
-          <form style="display: flex; justify-content: space-between;" action="/api/bookmarks/{{ id }}/" method="post">
+          <form style="display: flex; justify-content: space-between;" action="{% url 'edit' %}" method="post">
             {% csrf_token %}
             <input type="text" name="tags_string" style="width: 100%; margin: 0px 5px;"
               placeholder="tags; separated; by ;" value="{{ tags_string }}">

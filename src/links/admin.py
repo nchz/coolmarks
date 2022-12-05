@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from apps.loader.models import Bookmark, Tag
+from links.models import Link, Tag
 
 
-class BookmarkAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Bookmark._meta.get_fields()[:-1]]
+class LinkAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Link._meta.get_fields()[:-1]]
     readonly_fields = (
         "id",
         "owner",
@@ -16,13 +16,13 @@ class BookmarkAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "label",
+        "name",
     )
     readonly_fields = (
         "id",
-        "bookmarks_string",
+        "links_string",
     )
 
 
-admin.site.register(Bookmark, BookmarkAdmin)
+admin.site.register(Link, LinkAdmin)
 admin.site.register(Tag, TagAdmin)

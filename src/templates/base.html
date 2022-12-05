@@ -41,16 +41,16 @@
   <header>
     <div>
       <a href="/">
-        <img class="mx-3" height="100%" src="/static/imgs/reresearch-logo.png">
+        <img class="mx-3" height="100%" src="/static/imgs/coolmarks-logo.png">
       </a>
     </div>
     <div>
       {% if user.is_authenticated %}
-      <a href="/api/bookmarks.html" class="btn btn-primary" style="width: 100px;">My Links</a>
-      <a href="/api/auth/logout/" class="btn btn-primary" style="width: 100px;">Logout</a>
+      <a href="{% url 'list' %}" class="btn btn-primary" style="width: 100px;">My Links</a>
+      <a href="{% url 'account_logout' %}" class="btn btn-primary" style="width: 100px;">Logout</a>
       {% else %}
-      <a href="/api/auth/signup/" class="btn btn-primary" style="width: 100px;">Signup</a>
-      <a href="/api/auth/login/" class="btn btn-primary" style="width: 100px;">Login</a>
+      <a href="{% url 'account_signup' %}" class="btn btn-primary" style="width: 100px;">Signup</a>
+      <a href="{% url 'account_login' %}" class="btn btn-primary" style="width: 100px;">Login</a>
       {% endif %}
     </div>
   </header>
