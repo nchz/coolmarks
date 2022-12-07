@@ -10,7 +10,7 @@ body = {
     "link_ids": <list of ints>,
     # only for update.
     "action": <"add", "remove" or "set">,
-    "tags_string": <str>
+    "_tags_string": <str>
 }
 """
 from django.contrib.auth.decorators import login_required
@@ -44,13 +44,15 @@ def list_view(request):
             return HttpResponseBadRequest()
 
         location = request.POST["location"]
-        tags_string = request.POST.get("tags_string", "")
+        _tags_string = request.POST.get("_tags_string", "")
+
         link = Link(
             owner=request.user,
             location=location,
         )
-        link.tags_string = tags_string
+        link._tags_string = _tags_string
         link.save()
+
         return HttpResponseRedirect(reverse("links:list"))
 
 

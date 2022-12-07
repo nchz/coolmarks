@@ -28,9 +28,9 @@ class Tag(models.Model):
         return [cls.objects.get_or_create(name=t)[0] for t in tags]
 
     @staticmethod
-    def _parse_tags(tags_string):
+    def _parse_tags(string):
         tags = set()
-        for tag in tags_string.split(";"):
+        for tag in string.split(";"):
             tag = re.sub(r"[\s|\-|_]+", "_", tag)
             tag = re.sub(r"\W", "", tag)
             tag = re.sub(r"_+", "_", tag).strip("_")
@@ -87,8 +87,11 @@ class Link(models.Model):
             self.title = title
             self.domain = urlparse(self.location).netloc[:MAX_LENGTH]
             super().save(*args, **kwargs)
-            # tags_string = "; ".join(t.name for t in link.tags.all())
-            self.tags.set(Tag.from_string(self.tags_string), clear=True)
+            self.tags.set(Tag.from_string(self._tags_string), clear=True)
 
     def __str__(self):
         return f"[{self.id}; {self.owner.username}] {self.location} -- {self.title}"
+
+    @property
+    def tags_string(self):
+        return "; ".join(t.name for t in self.tags.all())

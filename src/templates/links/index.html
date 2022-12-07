@@ -9,7 +9,7 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
     {% with link_list|first as first %}
-    <input type="text" name="tags_string" style="width: 25%; margin: 0px 20px;" placeholder="tags; separated; by ;"
+    <input type="text" name="_tags_string" style="width: 25%; margin: 0px 20px;" placeholder="tags; separated; by ;"
       value="{{ first.tags_string }}">
     {% endwith %}
     <input type="url" name="location" style="width: 75%;" placeholder="http://example.com">
@@ -66,7 +66,7 @@
         <td>
           <form style="display: flex; justify-content: space-between;" action="{% url 'links:edit' %}" method="post">
             {% csrf_token %}
-            <input type="text" name="tags_string" style="width: 100%; margin: 0px 5px;"
+            <input type="text" name="_tags_string" style="width: 100%; margin: 0px 5px;"
               placeholder="tags; separated; by ;" value="{{ tags_string }}">
             <a href="javascript:alert('Not implemented yet')" class="btn btn-warning"
               style="padding: 5px 10px;">Edit?</a>
