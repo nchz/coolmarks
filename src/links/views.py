@@ -13,14 +13,15 @@ body = {
     "tags_string": <str>
 }
 """
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect,
 )
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
 from links.models import Link
 
@@ -47,10 +48,10 @@ def list_view(request):
         link = Link(
             owner=request.user,
             location=location,
-            tags_string=tags_string,
         )
+        link.tags_string = tags_string
         link.save()
-        return HttpResponseRedirect("/links/")
+        return HttpResponseRedirect(reverse("links:list"))
 
 
 @login_required

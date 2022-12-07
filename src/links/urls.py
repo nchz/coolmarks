@@ -8,7 +8,7 @@ from links.views import (
 )
 
 
-# app_name = "links"
+app_name = "links"
 
 urlpatterns = [
     path("", list_view, name="list"),
