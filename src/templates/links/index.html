@@ -30,7 +30,9 @@
       <td>{{ link.domain }}</td>
       <td>
         {% for tag in link.tags.all %}
-        <span class="my-1 badge rounded-pill bg-primary">{{ tag.name }}</span>
+        <span class="my-1 badge rounded-pill bg-primary">
+          {{ tag.name }}<span style="font-size: 0;">;</span>
+        </span>
         {% endfor %}
       </td>
     </tr>
