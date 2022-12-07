@@ -1,3 +1,4 @@
+import re
 from urllib.parse import urlparse
 
 from django.contrib.auth.models import User
@@ -18,7 +19,25 @@ driver_options.headless = True
 class Tag(models.Model):
     name = models.CharField(max_length=MAX_LENGTH)
 
-    # TODO add save() method with string cleaning.
+    @classmethod
+    def from_string(cls, tags_string):
+        """
+        Return a list of Tag instances which names come from `tags_string`.
+        """
+        tags = cls._parse_tags(tags_string)
+        return [cls.objects.get_or_create(name=t)[0] for t in tags]
+
+    @staticmethod
+    def _parse_tags(tags_string):
+        tags = set()
+        for tag in tags_string.split(";"):
+            tag = re.sub(r"[\s|\-|_]+", "_", tag)
+            tag = re.sub(r"\W", "", tag)
+            tag = re.sub(r"_+", "_", tag).strip("_")
+            tag = tag.replace("_", "-").lower()
+            if tag != "":
+                tags.add(tag)
+        return tags
 
     def __str__(self):
         return f"[{self.id}] {self.name}"
@@ -68,6 +87,8 @@ class Link(models.Model):
             self.title = title
             self.domain = urlparse(self.location).netloc[:MAX_LENGTH]
             super().save(*args, **kwargs)
+            # tags_string = "; ".join(t.name for t in link.tags.all())
+            self.tags.set(Tag.from_string(self.tags_string), clear=True)
 
     def __str__(self):
         return f"[{self.id}; {self.owner.username}] {self.location} -- {self.title}"
