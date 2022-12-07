@@ -75,7 +75,7 @@ class Link(models.Model):
             try:
                 r = requests.get(self.location)
                 tree = etree.fromstring(r.text, parser=etree.HTMLParser())
-                title = tree.xpath("//html/head/title")[0].text[:MAX_LENGTH]
+                title = tree.xpath("//html/head/title")[0].text
             except (requests.exceptions.ConnectionError, IndexError, TypeError):
                 try:
                     driver = webdriver.Chrome(
@@ -86,9 +86,9 @@ class Link(models.Model):
                     title = driver.title
                     driver.quit()
                 except Exception:
-                    title = self.location
+                    title = ""
 
-            self.title = title
+            self.title = (title.strip() or self.location)[:MAX_LENGTH]
             self.domain = urlparse(self.location).netloc[:MAX_LENGTH]
             super().save(*args, **kwargs)
             self.tags.set(Tag.from_string(self._tags_string), clear=True)
