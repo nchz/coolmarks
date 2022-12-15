@@ -1,8 +1,79 @@
 {% extends "base.html" %}
 
+{% block html_head %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+<script>
+
+  function findCheckedRows() {
+    var result = [];
+    $("table > tbody input[type='checkbox']:checked").each((i, elem) => {
+      result.push(elem.id);
+    });
+    return result;
+  }
+
+  $(document).ready(function () {
+    $("#links-edit-ajax").click(function () {
+      var checkedRows = findCheckedRows();
+      console.log(checkedRows);
+      $.post(
+        "{% url 'links:edit' %}",
+        {
+          "link_ids": checkedRows,
+        },
+        response => {
+          console.log(response);
+          // window.location.replace(e);
+        },
+      );
+      // return true;
+    });
+  });
+
+  $(document).ready(function () {
+    $("#links-edit-form").submit(function () {
+      var checkedRows = findCheckedRows();
+
+      $("<input />")
+        .attr("type", "hidden")
+        .attr("name", "link_ids")
+        .attr("value", checkedRows.join(","))
+        .appendTo(this);
+
+      return true;
+    });
+  });
+
+  $(document).ready(function () {
+    $("#select-all").click(function () {
+      if (this.checked) {
+        $("table > tbody input[type='checkbox']:not(:checked)").click();
+      } else {
+        $("table > tbody input[type='checkbox']:checked").click();
+      }
+    })
+  });
+
+  $(document).ready(function () {
+    console.log("aloha!");
+  });
+
+</script>
+
+{% endblock %}
+
 {% block body_main %}
 
 <div style="padding: 20px 20px 0px 20px;">
+  <button id="links-edit-ajax" class="btn btn-success" style="padding: 5px 20px;">links-edit-ajax</button>
+
+  <form id="links-edit-form" style="display: flex; justify-content: space-between;" action="{% url 'links:edit' %}"
+    method="POST">
+    <button type="submit" class="btn btn-success" style="padding: 5px 20px;">links-edit-form</button>
+  </form>
+
   <form style="display: flex; justify-content: space-between;" action="{% url 'links:list' %}" method="POST">
     {% csrf_token %}
     <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
@@ -10,12 +81,13 @@
     <input type="text" name="_tags_string" style="width: 25%; margin: 0px 20px;" placeholder="tags; separated; by ;"
       value="{{ first.tags_string }}">
     {% endwith %}
-    <input type="url" name="location" style="width: 75%;" placeholder="http://example.com">
+    <input required type="url" name="location" style="width: 75%;" placeholder="http://example.com">
   </form>
 </div>
-<table class="table table-hover">
+<table id="links-table" class="table table-hover">
   <thead>
     <tr>
+      <th><input id="select-all" type="checkbox"></th>
       <th>Date added</th>
       <th>Title</th>
       <th>Domain</th>
@@ -25,7 +97,13 @@
   <tbody>
     {% for link in link_list %}
     <tr>
-      <td>{{ link.dt | slice:":19" }}</td>
+      <td>
+        <input id="{{ link.id }}" type="checkbox"
+          onchange="this.parentElement.parentElement.classList.toggle('table-active')">
+      </td>
+      <td onclick="$('input#{{ link.id }}').click()">
+        {{ link.dt | slice:":19" }}
+      </td>
       <td><a href="{{ link.location }}" target="_blank">{{ link.title }}</a></td>
       <td>{{ link.domain }}</td>
       <td>
