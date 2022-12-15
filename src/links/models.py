@@ -94,7 +94,7 @@ class Link(models.Model):
             self.tags.set(Tag.from_string(self._tags_string), clear=True)
 
     def __str__(self):
-        return f"[{self.id}; {self.owner.username}] {self.location} -- {self.title}"
+        return f"[{self.id}; {self.owner.username}] {self.location} :: {self.title}"
 
     @property
     def tags_string(self):
