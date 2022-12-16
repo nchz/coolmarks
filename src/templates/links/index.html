@@ -15,33 +15,13 @@
   }
 
   $(document).ready(function () {
-    $("#links-edit-ajax").click(function () {
+    $("#delete-form").submit(function () {
       var checkedRows = findCheckedRows();
-      console.log(checkedRows);
-      $.post(
-        "{% url 'links:edit' %}",
-        {
-          "link_ids": checkedRows,
-        },
-        response => {
-          console.log(response);
-          // window.location.replace(e);
-        },
-      );
-      // return true;
-    });
-  });
-
-  $(document).ready(function () {
-    $("#links-edit-form").submit(function () {
-      var checkedRows = findCheckedRows();
-
       $("<input />")
         .attr("type", "hidden")
         .attr("name", "link_ids")
         .attr("value", checkedRows.join(","))
         .appendTo(this);
-
       return true;
     });
   });
@@ -67,14 +47,13 @@
 {% block body_main %}
 
 <div style="padding: 20px 20px 0px 20px;">
-  <button id="links-edit-ajax" class="btn btn-success" style="padding: 5px 20px;">links-edit-ajax</button>
-
-  <form id="links-edit-form" style="display: flex; justify-content: space-between;" action="{% url 'links:edit' %}"
-    method="POST">
-    <button type="submit" class="btn btn-success" style="padding: 5px 20px;">links-edit-form</button>
+  <form id="delete-form" action="{% url 'links:delete' %}" method="POST"
+    style="display: flex; justify-content: space-between;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger" style="padding: 5px 20px;">Delete</button>
   </form>
 
-  <form style="display: flex; justify-content: space-between;" action="{% url 'links:list' %}" method="POST">
+  <form action="{% url 'links:list' %}" method="POST" style="display: flex; justify-content: space-between;">
     {% csrf_token %}
     <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
     {% with link_list|first as first %}

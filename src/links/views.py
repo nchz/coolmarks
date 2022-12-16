@@ -59,7 +59,13 @@ def list_view(request):
 @login_required
 @require_http_methods(["POST"])
 def delete_view(request):
-    return HttpResponse("delete_view")
+    link_ids = [int(i) for i in request.POST.get("link_ids", "").split(",")]
+    objs = Link.objects.filter(
+        pk__in=link_ids,
+        owner=request.user,
+    )
+    objs.delete()
+    return HttpResponseRedirect(reverse("links:list"))
 
 
 @login_required
