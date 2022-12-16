@@ -59,7 +59,7 @@ def list_view(request):
 @login_required
 @require_http_methods(["POST"])
 def delete_view(request):
-    link_ids = [int(i) for i in request.POST.get("link_ids", "").split(",")]
+    link_ids = [int(i) for i in request.POST.get("link_ids", "").split(",") if i != ""]
     objs = Link.objects.filter(
         pk__in=link_ids,
         owner=request.user,
