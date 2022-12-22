@@ -46,23 +46,41 @@
 
 {% block body_main %}
 
+<div class="d-flex m-2">
+
+  <div style="width: 150;">
+    <h6 class="mx-2 mt-1 mb-0">Select</h6>
+    <div class="d-flex">
+      <button class="col m-1 btn btn-secondary">All</button>
+      <button class="col m-1 btn btn-secondary">None</button>
+    </div>
+  </div>
+
+  <div class="vr m-2"></div>
+
+  <div class="col">
+    <h6 class="mx-2 mt-1 mb-0">Add Link</h6>
+    <form action="{% url 'links:list' %}" method="POST" class="d-flex">
+      {% csrf_token %}
+      <button type="submit" class="m-1 btn btn-success">+</button>
+      {% with link_list|first as first %}
+      <input type="text" name="_tags_string" placeholder="tags; separated; by ;" value="{{ first.tags_string }}"
+        class="col m-1">
+      {% endwith %}
+      <input required type="url" name="location" placeholder="http://example.com" class="w-75 m-1">
+    </form>
+  </div>
+
+</div>
+
 <div style="padding: 20px 20px 0px 20px;">
   <form id="delete-form" action="{% url 'links:delete' %}" method="POST"
     style="display: flex; justify-content: space-between;">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger" style="padding: 5px 20px;">Delete</button>
   </form>
-
-  <form action="{% url 'links:list' %}" method="POST" style="display: flex; justify-content: space-between;">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-success" style="padding: 5px 20px;">Add</button>
-    {% with link_list|first as first %}
-    <input type="text" name="_tags_string" style="width: 25%; margin: 0px 20px;" placeholder="tags; separated; by ;"
-      value="{{ first.tags_string }}">
-    {% endwith %}
-    <input required type="url" name="location" style="width: 75%;" placeholder="http://example.com">
-  </form>
 </div>
+
 <table id="links-table" class="table table-hover">
   <thead>
     <tr>
