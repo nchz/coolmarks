@@ -28,11 +28,13 @@
 
   $(document).ready(function () {
     $("#select-all").click(function () {
-      if (this.checked) {
-        $("table > tbody input[type='checkbox']:not(:checked)").click();
-      } else {
-        $("table > tbody input[type='checkbox']:checked").click();
-      }
+      $("table > tbody input[type='checkbox']:not(:checked)").click();
+    })
+  });
+
+  $(document).ready(function () {
+    $("#select-none").click(function () {
+      $("table > tbody input[type='checkbox']:checked").click();
     })
   });
 
@@ -51,8 +53,8 @@
   <div style="width: 150;">
     <h6 class="mx-2 mt-1 mb-0">Select</h6>
     <div class="d-flex">
-      <button class="col m-1 btn btn-secondary">All</button>
-      <button class="col m-1 btn btn-secondary">None</button>
+      <button id="select-all" class="col m-1 btn btn-secondary">All</button>
+      <button id="select-none" class="col m-1 btn btn-secondary">None</button>
     </div>
   </div>
 
@@ -65,9 +67,9 @@
       <button type="submit" class="m-1 btn btn-success">+</button>
       {% with link_list|first as first %}
       <input type="text" name="_tags_string" placeholder="tags; separated; by ;" value="{{ first.tags_string }}"
-        class="col m-1">
+        class="col m-1 form-control">
       {% endwith %}
-      <input required type="url" name="location" placeholder="http://example.com" class="w-75 m-1">
+      <input required type="url" name="location" placeholder="http://example.com" class="w-75 m-1 form-control">
     </form>
   </div>
 
@@ -84,7 +86,7 @@
 <table id="links-table" class="table table-hover">
   <thead>
     <tr>
-      <th><input id="select-all" type="checkbox"></th>
+      <th></th>
       <th>Date added</th>
       <th>Title</th>
       <th>Domain</th>
@@ -94,7 +96,7 @@
   <tbody>
     {% for link in link_list %}
     <tr>
-      <td>
+      <td style="width: 0;">
         <input id="{{ link.id }}" type="checkbox"
           onchange="this.parentElement.parentElement.classList.toggle('table-active')">
       </td>
