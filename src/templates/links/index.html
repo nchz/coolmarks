@@ -16,7 +16,7 @@
 
   $(document).ready(function () {
     $("#delete-form").submit(function () {
-      var checkedRows = findCheckedRows();
+      const checkedRows = findCheckedRows();
       $("<input />")
         .attr("type", "hidden")
         .attr("name", "link_ids")
@@ -38,6 +38,24 @@
     })
   });
 
+  function selectRow(elem) {
+    // highlight row.
+    elem.parentElement.parentElement.classList.toggle("table-active");
+
+    // toggle visibility of panels if necessary.
+    const panelAdd = document.getElementById("panel-add");
+    const panelEdit = document.getElementById("panel-edit");
+
+    if (findCheckedRows().length == 0) {
+      panelAdd.classList.remove("d-none");
+      panelEdit.classList.add("d-none");
+    } else {
+      // TODO extract tags from selected links and set input.value.
+      panelAdd.classList.add("d-none");
+      panelEdit.classList.remove("d-none");
+    }
+  }
+
   $(document).ready(function () {
     console.log("aloha!");
   });
@@ -48,9 +66,9 @@
 
 {% block body_main %}
 
-<div class="d-flex m-2">
+<div id="top-panel" class="d-flex m-2">
 
-  <div style="width: 150;">
+  <div id="panel-select" style="width: 150;">
     <h6 class="mx-2 mt-1 mb-0">Select</h6>
     <div class="d-flex">
       <button id="select-all" class="col m-1 btn btn-secondary">All</button>
@@ -60,7 +78,9 @@
 
   <div class="vr m-2"></div>
 
-  <div class="col">
+  <!-- Either "panel-add" or "panel-edit" is visible (depending on selected rows), never both at the same time. -->
+
+  <div id="panel-add" class="col">
     <h6 class="mx-2 mt-1 mb-0">Add Link</h6>
     <form action="{% url 'links:list' %}" method="POST" class="d-flex">
       {% csrf_token %}
@@ -73,14 +93,18 @@
     </form>
   </div>
 
-</div>
+  <div id="panel-edit" class="d-none col">
+    <h6 class="mx-2 mt-1 mb-0">Edit Tags</h6>
+    <form action="{% url 'links:edit' %}" method="POST" class="d-flex">
+      {% csrf_token %}
+      <button type="submit" class="m-1 btn btn-warning">Add</button>
+      <button type="submit" class="m-1 btn btn-warning">Remove</button>
+      <button type="submit" class="m-1 btn btn-warning">Set</button>
+      <input type="text" name="_tags_string" placeholder="tags; separated; by ;" class="col m-1 form-control">
+      <button id="delete-form" type="submit" class="m-1 btn btn-danger">Delete</button>
+    </form>
+  </div>
 
-<div style="padding: 20px 20px 0px 20px;">
-  <form id="delete-form" action="{% url 'links:delete' %}" method="POST"
-    style="display: flex; justify-content: space-between;">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger" style="padding: 5px 20px;">Delete</button>
-  </form>
 </div>
 
 <table id="links-table" class="table table-hover">
@@ -97,8 +121,7 @@
     {% for link in link_list %}
     <tr>
       <td style="width: 0;">
-        <input id="{{ link.id }}" type="checkbox"
-          onchange="this.parentElement.parentElement.classList.toggle('table-active')">
+        <input id="{{ link.id }}" type="checkbox" onchange="selectRow(this)">
       </td>
       <td onclick="$('input#{{ link.id }}').click()">
         {{ link.dt | slice:":19" }}
