@@ -9,7 +9,7 @@
   function findCheckedRows() {
     var result = [];
     $("table > tbody input[type='checkbox']:checked").each((i, elem) => {
-      result.push(elem.id);
+      result.push(elem);
     });
     return result;
   }
@@ -20,7 +20,7 @@
       $("<input />")
         .attr("type", "hidden")
         .attr("name", "link_ids")
-        .attr("value", checkedRows.join(","))
+        .attr("value", checkedRows.map(elem => elem.id).join(","))
         .appendTo(this);
       return true;
     });
@@ -56,11 +56,18 @@
     const panelAdd = document.getElementById("panel-add");
     const panelEdit = document.getElementById("panel-edit");
 
-    if (findCheckedRows().length == 0) {
+    const checkedRows = findCheckedRows();
+    if (checkedRows.length == 0) {
+      // show only "panel-add".
       panelAdd.classList.remove("d-none");
       panelEdit.classList.add("d-none");
     } else {
-      // TODO extract tags from selected links and set input.value.
+      // find tags from selected rows.
+      const allTags = checkedRows.map(elem => elem.name).join(";").split(";").map(s => s.trim());
+      const tagsSet = allTags.filter((item, index) => item != "" && allTags.indexOf(item) == index).join("; ");
+      // update tags input placeholder in form.
+      document.getElementById("edit-tags-input").value = tagsSet;
+      // show only "panel-edit".
       panelAdd.classList.add("d-none");
       panelEdit.classList.remove("d-none");
     }
@@ -111,10 +118,8 @@
         <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-set">Set</button>
         <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-add">Add</button>
         <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-remove">Remove</button>
-        {% with link_list|first as first %}
-        <input type="text" name="_tags_string" placeholder="tags; separated; by ;" value="{{ first.tags_string }}"
+        <input id="edit-tags-input" type="text" name="_tags_string" placeholder="tags; separated; by ;"
           class="col m-1 form-control">
-        {% endwith %}
       </form>
       <div class="vr mx-2"></div>
       <form id="delete-links-form" action="{% url 'links:delete' %}" method="POST" class="-links-form">
@@ -140,7 +145,7 @@
     {% for link in link_list %}
     <tr>
       <td style="width: 0;">
-        <input id="{{ link.id }}" type="checkbox" onchange="selectRow(this)">
+        <input id="{{ link.id }}" type="checkbox" onchange="selectRow(this)" name="{{ link.tags_string }}">
       </td>
       <td onclick="$('input#{{ link.id }}').click()">
         {{ link.dt | slice:":19" }}
