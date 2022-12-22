@@ -15,7 +15,7 @@
   }
 
   $(document).ready(function () {
-    $("#delete-form").submit(function () {
+    $(".-links-form").submit(function () {
       const checkedRows = findCheckedRows();
       $("<input />")
         .attr("type", "hidden")
@@ -23,6 +23,16 @@
         .attr("value", checkedRows.join(","))
         .appendTo(this);
       return true;
+    });
+  });
+
+  $(document).ready(function () {
+    $(".-links-form-button").click(function () {
+      $("<input />")
+        .attr("type", "hidden")
+        .attr("name", "action")
+        .attr("value", this.id.substring(5))
+        .appendTo(this.parentElement);
     });
   });
 
@@ -95,14 +105,23 @@
 
   <div id="panel-edit" class="d-none col">
     <h6 class="mx-2 mt-1 mb-0">Edit Tags</h6>
-    <form action="{% url 'links:edit' %}" method="POST" class="d-flex">
-      {% csrf_token %}
-      <button type="submit" class="m-1 btn btn-warning">Add</button>
-      <button type="submit" class="m-1 btn btn-warning">Remove</button>
-      <button type="submit" class="m-1 btn btn-warning">Set</button>
-      <input type="text" name="_tags_string" placeholder="tags; separated; by ;" class="col m-1 form-control">
-      <button id="delete-form" type="submit" class="m-1 btn btn-danger">Delete</button>
-    </form>
+    <div class="d-flex">
+      <form id="edit-tags-form" action="{% url 'links:edit' %}" method="POST" class="-links-form d-flex col">
+        {% csrf_token %}
+        <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-set">Set</button>
+        <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-add">Add</button>
+        <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-remove">Remove</button>
+        {% with link_list|first as first %}
+        <input type="text" name="_tags_string" placeholder="tags; separated; by ;" value="{{ first.tags_string }}"
+          class="col m-1 form-control">
+        {% endwith %}
+      </form>
+      <div class="vr mx-2"></div>
+      <form id="delete-links-form" action="{% url 'links:delete' %}" method="POST" class="-links-form">
+        {% csrf_token %}
+        <button type="submit" class="m-1 btn btn-danger">Delete Links</button>
+      </form>
+    </div>
   </div>
 
 </div>

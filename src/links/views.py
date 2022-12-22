@@ -23,7 +23,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from links.models import Link
+from links.models import Link, Tag
 
 
 @login_required
@@ -71,7 +71,22 @@ def delete_view(request):
 @login_required
 @require_http_methods(["POST"])
 def edit_view(request):
-    return HttpResponse("edit_view")
+    link_ids = [int(i) for i in request.POST.get("link_ids", "").split(",") if i != ""]
+    action = request.POST.get("action")
+    _tags_string = request.POST.get("_tags_string", "")
+
+    tags = Tag.from_string(_tags_string)
+    if action == "set":
+        tags = [tags]
+
+    objs = Link.objects.filter(
+        pk__in=link_ids,
+        owner=request.user,
+    )
+    for o in objs:
+        getattr(o.tags, action)(*tags)
+
+    return HttpResponseRedirect(reverse("links:list"))
 
 
 @login_required
