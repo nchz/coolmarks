@@ -9,5 +9,5 @@ urlpatterns = [
     path("", views.list_view, name="list"),
     path("delete/", views.delete_view, name="delete"),
     path("edit/", views.edit_view, name="edit"),
-    path("update/", views.update_view, name="update"),
+    path("bulk/", views.bulk_add_view, name="bulk_add"),
 ]

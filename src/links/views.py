@@ -13,12 +13,10 @@ body = {
     "_tags_string": <str>
 }
 """
+from urllib.parse import urlparse
+
 from django.contrib.auth.decorators import login_required
-from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseRedirect,
-)
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -90,6 +88,27 @@ def edit_view(request):
 
 
 @login_required
-@require_http_methods(["POST"])
-def update_view(request):
-    return HttpResponse("update_view")
+@require_http_methods(["GET", "POST"])
+def bulk_add_view(request):
+    if request.method == "GET":
+        return render(request, "links/bulk.html")
+
+    elif request.method == "POST":
+        if "location_list" not in request.POST:
+            return HttpResponseBadRequest()
+
+        location_list = request.POST["location_list"]
+        _tags_string = request.POST.get("_tags_string", "")
+
+        locations = [loc.strip() for loc in location_list.split() if loc.strip()]
+        for location in locations:
+            parsed_loc = urlparse(location)
+            if parsed_loc.scheme and parsed_loc.netloc:
+                link = Link(
+                    owner=request.user,
+                    location=location,
+                )
+                link._tags_string = _tags_string
+                link.save()
+
+        return HttpResponseRedirect(reverse("links:list"))
