@@ -22,7 +22,12 @@
         .attr("name", "link_ids")
         .attr("value", checkedRows.map(elem => elem.id).join(","))
         .appendTo(this);
-      return true;
+
+      if (this.id == "delete-links-form") {
+        return confirm(`Delete ${checkedRows.length} items?`);
+      } else {
+        return true;
+      }
     });
   });
 
