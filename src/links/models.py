@@ -17,7 +17,7 @@ driver_options.headless = True
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=MAX_LENGTH)
+    name = models.CharField(max_length=MAX_LENGTH)  # TODO unique=True,
 
     @classmethod
     def from_string(cls, tags_string):
@@ -63,9 +63,13 @@ class Link(models.Model):
         max_length=MAX_LENGTH,
         editable=False,
     )
+    # TODO
+    # description = models.TextField(editable=False)
     tags = models.ManyToManyField(Tag, default=None)
 
     class Meta:
+        # TODO
+        # unique_together = ("owner", "location")
         ordering = ("-dt",)
 
     def save(self, *args, **kwargs):
@@ -74,8 +78,14 @@ class Link(models.Model):
             # process link to get required values.
             try:
                 r = requests.get(self.location)
+
+                # TODO add unidecode or something to avoid `ValueError`:
+                #   Unicode strings with encoding declaration are not supported.
+                #   Please use bytes input or XML fragments without declaration.
                 tree = etree.fromstring(r.text, parser=etree.HTMLParser())
+
                 title = tree.xpath("//html/head/title")[0].text
+                # desc = tree.xpath("//meta[@name='description']/@content")[0]
             except (requests.exceptions.ConnectionError, IndexError, TypeError):
                 try:
                     driver = webdriver.Chrome(
@@ -83,12 +93,19 @@ class Link(models.Model):
                         options=driver_options,
                     )
                     driver.get(self.location)
-                    title = driver.title
+                    title = driver.title or ""
+                    # desc = driver.find_element(
+                    #     by="xpath",
+                    #     value="//html/head/meta[@name='description']",
+                    # ).get_attribute("content") or ""
                     driver.quit()
                 except Exception:
                     title = ""
+                    # desc = ""
 
             self.title = (title.strip() or self.location)[:MAX_LENGTH]
+            # TODO
+            # self.description = desc.strip()
             self.domain = urlparse(self.location).netloc[:MAX_LENGTH]
             super().save(*args, **kwargs)
             self.tags.set(Tag.from_string(self._tags_string), clear=True)
