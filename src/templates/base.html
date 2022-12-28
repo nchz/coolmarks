@@ -1,9 +1,11 @@
 <html>
 
 <head>
-  <link
-    href="https://bootswatch.com/5/{% if request.user.username == 'ig' %}flatly{% else %}darkly{% endif %}/bootstrap.min.css"
-    rel="stylesheet">
+  <title>Coolmarks {% block html_title %}{% endblock %}</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://bootswatch.com/5/flatly/bootstrap.min.css" rel="stylesheet">
 
   <style>
     :root {
