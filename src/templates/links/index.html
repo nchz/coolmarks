@@ -6,64 +6,38 @@
 
 <script>
 
-  function findCheckedRows() {
+  // helper functions.
+
+  function queryCheckboxes(checked) {
+    const selector = "table > tbody input[type='checkbox']";
+    const filter = checked ? "checked" : "not(:checked)";
+    return document.querySelectorAll(`${selector}:${filter}`);
+  }
+
+  function listCheckedRows() {
     var result = [];
-    document.querySelectorAll("table > tbody input[type='checkbox']:checked").forEach(elem => {
+    queryCheckboxes(true).forEach(elem => {
       result.push(elem);
     });
     return result;
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("delete-links-button").addEventListener("click", function (event) {
-      const checkedRows = findCheckedRows();
-      if (!confirm(`Delete ${checkedRows.length} items?`)) {
-        event.preventDefault();
-      }
-    });
-
-    document.querySelectorAll(".-links-form").forEach(elem => {
-      elem.addEventListener("submit", function (event) {
-        const checkedRows = findCheckedRows();
-        const inputElem = document.createElement("input");
-        inputElem.setAttribute("type", "hidden");
-        inputElem.setAttribute("name", "link_ids");
-        inputElem.setAttribute("value", checkedRows.map(elem => elem.id).join(","));
-        this.append(inputElem);
-      });
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".-links-form-button").forEach(elem => {
-      elem.addEventListener("click", function (event) {
-        const inputElem = document.createElement("input");
-        inputElem.setAttribute("type", "hidden");
-        inputElem.setAttribute("name", "action");
-        inputElem.setAttribute("value", this.id.substring(5));
-        this.parentElement.append(inputElem);
-      });
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("select-all").addEventListener("click", function (event) {
-      document.querySelectorAll("table > tbody input[type='checkbox']:not(:checked)").forEach(elem => elem.click());
-    });
-    document.getElementById("select-none").addEventListener("click", function (event) {
-      document.querySelectorAll("table > tbody input[type='checkbox']:checked").forEach(elem => elem.click());
-    });
-  });
+  function addHiddenInput(formElem, inputName, inputValue) {
+    const inputElem = document.createElement("input");
+    inputElem.setAttribute("type", "hidden");
+    inputElem.setAttribute("name", inputName);
+    inputElem.setAttribute("value", inputValue);
+    formElem.append(inputElem);
+  }
 
   function selectRow(elem) {
-    // highlight row.
+    // highlight row: tr > td > input
     elem.parentElement.parentElement.classList.toggle("table-active");
 
     // toggle visibility of panels if necessary.
     const panelAdd = document.getElementById("panel-add");
     const panelEdit = document.getElementById("panel-edit");
-
-    const checkedRows = findCheckedRows();
+    const checkedRows = listCheckedRows();
     if (checkedRows.length == 0) {
       // show only "panel-add".
       panelAdd.classList.remove("d-none");
@@ -80,15 +54,42 @@
     }
   }
 
+  // on load setup.
+
   document.addEventListener("DOMContentLoaded", function () {
+    // add extra input to the forms before sending them to the backend.
+    document.querySelectorAll("form.-links-form").forEach(elem => {
+      elem.addEventListener("submit", function (event) {
+        const checkedRows = listCheckedRows();
+        addHiddenInput(this, "link_ids", checkedRows.map(elem => elem.id).join(","));
+        addHiddenInput(this, "action", event.submitter.id.split("-")[0]);
+      });
+    });
+
+    // "are you sure?" before delete.
+    document.getElementById("delete-links-button").addEventListener("click", function (event) {
+      const checkedRows = listCheckedRows();
+      if (!confirm(`Delete ${checkedRows.length} items?`)) {
+        event.preventDefault();
+      }
+    });
+
+    // select all/none buttons.
+    document.getElementById("select-all").addEventListener("click", function (event) {
+      queryCheckboxes(false).forEach(elem => elem.click());
+    });
+    document.getElementById("select-none").addEventListener("click", function (event) {
+      queryCheckboxes(true).forEach(elem => elem.click());
+    });
+
+    // build tooltips.
+    // https://getbootstrap.com/docs/5.0/components/tooltips/#example-enable-tooltips-everywhere
     var tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle='tooltip']"))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
     })
-  });
 
-  document.addEventListener("DOMContentLoaded", function () {
-    console.log("aloha!");
+    console.log("DOM loaded!");
   });
 
 </script>
@@ -129,11 +130,11 @@
     <div class="d-flex">
       <form id="edit-tags-form" action="{% url 'links:edit' %}" method="POST" class="-links-form d-flex col">
         {% csrf_token %}
-        <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-set" data-bs-toggle="tooltip"
+        <button id="set-tags-button" type="submit" class="m-1 btn btn-warning" data-bs-toggle="tooltip"
           data-bs-placement="bottom" title="Replace tags for selected items">Set</button>
-        <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-add" data-bs-toggle="tooltip"
+        <button id="add-tags-button" type="submit" class="m-1 btn btn-warning" data-bs-toggle="tooltip"
           data-bs-placement="bottom" title="Add tags to selected items">Add</button>
-        <button type="submit" class="-links-form-button m-1 btn btn-warning" id="tags-remove" data-bs-toggle="tooltip"
+        <button id="remove-tags-button" type="submit" class="m-1 btn btn-warning" data-bs-toggle="tooltip"
           data-bs-placement="bottom" title="Remove tags from selected items">Remove</button>
         <input id="edit-tags-input" type="text" name="_tags_string" placeholder="tags; separated; by ;"
           class="col m-1 form-control">
