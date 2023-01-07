@@ -9,6 +9,7 @@
   // helper functions.
 
   function queryCheckboxes(checked) {
+    // const selector = "table > tbody > tr:not(.d-none) input[type='checkbox']";
     const selector = "table > tbody input[type='checkbox']";
     const filter = checked ? "checked" : "not(:checked)";
     return document.querySelectorAll(`${selector}:${filter}`);
@@ -82,8 +83,30 @@
       queryCheckboxes(true).forEach(elem => elem.click());
     });
 
-    // build tooltips.
-    // https://getbootstrap.com/docs/5.0/components/tooltips/#example-enable-tooltips-everywhere
+    // search.
+    function filterRows(searchText) {
+      document.querySelectorAll("table > tbody > tr").forEach(row => {
+        var show = true;
+        for (const word of searchText.trim().toLowerCase().split(/\s+/)) {
+          show &= row.textContent.toLowerCase().includes(word);
+        }
+        if (show) {
+          row.classList.remove("d-none");
+        } else {
+          row.classList.add("d-none");
+        }
+      });
+    }
+    document.getElementById("search-text").addEventListener("input", function (event) {
+      filterRows(this.value);
+    });
+    // clear search button.
+    document.getElementById("clear-search-text").addEventListener("click", function (event) {
+      document.getElementById("search-text").value = "";
+      filterRows("");
+    });
+
+    // build tooltips: https://getbootstrap.com/docs/5.0/components/tooltips/#example-enable-tooltips-everywhere
     var tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle='tooltip']"))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -98,10 +121,10 @@
 
 {% block body_main %}
 
-<div id="top-panel" class="d-flex m-2">
+<div id="top-panel" class="d-flex m-2 mb-1">
 
   <div id="panel-select" style="width: 150;">
-    <h6 class="mx-2 mt-1 mb-0">Select</h6>
+    <h6 class="m-2 mb-0">Select</h6>
     <div class="d-flex">
       <button id="select-all" class="col m-1 btn btn-primary">All</button>
       <button id="select-none" class="col m-1 btn btn-primary">None</button>
@@ -113,7 +136,7 @@
   <!-- Either "panel-add" or "panel-edit" is visible (depending on selected rows), never both at the same time. -->
 
   <div id="panel-add" class="col">
-    <h6 class="mx-2 mt-1 mb-0">Add Link</h6>
+    <h6 class="m-2 mb-0">Add Link</h6>
     <form action="{% url 'links:list' %}" method="POST" class="d-flex">
       {% csrf_token %}
       <button type="submit" class="m-1 btn btn-success">+</button>
@@ -126,7 +149,7 @@
   </div>
 
   <div id="panel-edit" class="d-none col">
-    <h6 class="mx-2 mt-1 mb-0">Edit Tags</h6>
+    <h6 class="m-2 mb-0">Edit Tags</h6>
     <div class="d-flex">
       <form id="edit-tags-form" action="{% url 'links:edit' %}" method="POST" class="-links-form d-flex col">
         {% csrf_token %}
@@ -147,6 +170,11 @@
     </div>
   </div>
 
+</div>
+
+<div id="panel-search" class="mx-2 mb-3 d-flex">
+  <button id="clear-search-text" class="m-1 btn btn-danger">Clear</button>
+  <input id="search-text" type="text" class="m-1 form-control" placeholder="Search by text">
 </div>
 
 <table id="links-table" class="table table-hover">
