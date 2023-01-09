@@ -8,16 +8,15 @@
 
   // helper functions.
 
-  function queryCheckboxes(checked) {
-    // const selector = "table > tbody > tr:not(.d-none) input[type='checkbox']";
-    const selector = "table > tbody input[type='checkbox']";
+  function queryVisibleCheckboxes(checked) {
+    const selector = "table > tbody > tr:not(.d-none) input[type='checkbox']";
     const filter = checked ? "checked" : "not(:checked)";
     return document.querySelectorAll(`${selector}:${filter}`);
   }
 
   function listCheckedRows() {
     var result = [];
-    queryCheckboxes(true).forEach(elem => {
+    queryVisibleCheckboxes(true).forEach(elem => {
       result.push(elem);
     });
     return result;
@@ -46,9 +45,10 @@
     } else {
       // find tags from selected rows.
       const allTags = checkedRows.map(elem => elem.name).join(";").split(";").map(s => s.trim());
-      const tagsSet = allTags.filter((item, index) => item != "" && allTags.indexOf(item) == index).join("; ");
+      // deduplicate.
+      const tagsString = allTags.filter((item, index) => item != "" && allTags.indexOf(item) == index).join("; ");
       // update tags input placeholder in form.
-      document.getElementById("edit-tags-input").value = tagsSet;
+      document.getElementById("edit-tags-input").value = tagsString;
       // show only "panel-edit".
       panelAdd.classList.add("d-none");
       panelEdit.classList.remove("d-none");
@@ -77,10 +77,10 @@
 
     // select all/none buttons.
     document.getElementById("select-all").addEventListener("click", function (event) {
-      queryCheckboxes(false).forEach(elem => elem.click());
+      queryVisibleCheckboxes(false).forEach(elem => elem.click());
     });
     document.getElementById("select-none").addEventListener("click", function (event) {
-      queryCheckboxes(true).forEach(elem => elem.click());
+      queryVisibleCheckboxes(true).forEach(elem => elem.click());
     });
 
     // search.
