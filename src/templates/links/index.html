@@ -200,7 +200,10 @@
         {{ link.dt | slice:":19" }}
       </td>
       <td><a href="{{ link.location }}" target="_blank">{{ link.title }}</a></td>
-      <td>{{ link.domain }}</td>
+      <td>
+        <img src="https://www.google.com/s2/favicons?sz=16&domain_url={{ link.domain }}" class="m-1">
+        {{ link.domain }}
+      </td>
       <td onclick="document.getElementById('{{ link.id }}').click()">
         {% for tag in link.tags.all %}
         <span class="my-1 badge rounded-pill bg-primary">
