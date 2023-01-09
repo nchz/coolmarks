@@ -14,7 +14,7 @@
     return document.querySelectorAll(`${selector}:${filter}`);
   }
 
-  function listCheckedRows() {
+  function listVisibleCheckedRows() {
     var result = [];
     queryVisibleCheckboxes(true).forEach(elem => {
       result.push(elem);
@@ -30,14 +30,10 @@
     formElem.append(inputElem);
   }
 
-  function selectRow(elem) {
-    // highlight row: tr > td > input
-    elem.parentElement.parentElement.classList.toggle("table-active");
-
-    // toggle visibility of panels if necessary.
+  function togglePanelVisibility() {
     const panelAdd = document.getElementById("panel-add");
     const panelEdit = document.getElementById("panel-edit");
-    const checkedRows = listCheckedRows();
+    const checkedRows = listVisibleCheckedRows();
     if (checkedRows.length == 0) {
       // show only "panel-add".
       panelAdd.classList.remove("d-none");
@@ -55,13 +51,19 @@
     }
   }
 
+  function toggleHighlight(checkboxElem) {
+    // tr > td > input[type='checkbox']
+    checkboxElem.parentElement.parentElement.classList.toggle("table-active");
+    togglePanelVisibility();
+  }
+
   // on load setup.
 
   document.addEventListener("DOMContentLoaded", function () {
     // add extra input to the forms before sending them to the backend.
     document.querySelectorAll("form.-links-form").forEach(elem => {
       elem.addEventListener("submit", function (event) {
-        const checkedRows = listCheckedRows();
+        const checkedRows = listVisibleCheckedRows();
         addHiddenInput(this, "link_ids", checkedRows.map(elem => elem.id).join(","));
         addHiddenInput(this, "action", event.submitter.id.split("-")[0]);
       });
@@ -69,7 +71,7 @@
 
     // "are you sure?" before delete.
     document.getElementById("delete-links-button").addEventListener("click", function (event) {
-      const checkedRows = listCheckedRows();
+      const checkedRows = listVisibleCheckedRows();
       if (!confirm(`Delete ${checkedRows.length} items?`)) {
         event.preventDefault();
       }
@@ -96,6 +98,7 @@
           row.classList.add("d-none");
         }
       });
+      togglePanelVisibility();
     }
     document.getElementById("search-text").addEventListener("input", function (event) {
       filterRows(this.value);
@@ -191,7 +194,7 @@
     {% for link in link_list %}
     <tr>
       <td style="width: 0;">
-        <input id="{{ link.id }}" type="checkbox" onchange="selectRow(this)" name="{{ link.tags_string }}">
+        <input id="{{ link.id }}" type="checkbox" onchange="toggleHighlight(this)" name="{{ link.tags_string }}">
       </td>
       <td onclick="document.getElementById('{{ link.id }}').click()">
         {{ link.dt | slice:":19" }}
