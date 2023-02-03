@@ -10,4 +10,5 @@ urlpatterns = [
     path("delete/", views.delete_view, name="delete"),
     path("edit/", views.edit_view, name="edit"),
     path("bulk/", views.bulk_add_view, name="bulk_add"),
+    path("check/", views.check_view, name="check"),
 ]

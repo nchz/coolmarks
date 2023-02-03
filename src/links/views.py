@@ -13,12 +13,14 @@ body = {
     "_tags_string": <str>
 }
 """
+import json
 from urllib.parse import urlparse
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from links.models import Link, Tag
@@ -112,3 +114,25 @@ def bulk_add_view(request):
                 link.save()
 
         return HttpResponseRedirect(reverse("links:list"))
+
+
+@csrf_exempt
+@login_required
+@require_http_methods(["POST"])
+def check_view(request):
+    data = json.loads(request.body)
+    location = data["location"]
+    try:
+        link = Link.objects.get(
+            location=location,
+            owner=request.user,
+        )
+        result = {
+            "link_id": link.id,
+        }
+    except Link.DoesNotExist:
+        result = {
+            "link_id": None,
+        }
+
+    return JsonResponse(result)
