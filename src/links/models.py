@@ -106,9 +106,10 @@ class Link(models.Model):
             self.title = (title.strip() or self.location)[:MAX_LENGTH]
             # TODO
             # self.description = desc.strip()
-            self.domain = urlparse(self.location).netloc[:MAX_LENGTH]
-            super().save(*args, **kwargs)
-            self.tags.set(Tag.from_string(self._tags_string), clear=True)
+
+        self.domain = urlparse(self.location).netloc[:MAX_LENGTH]
+        super().save(*args, **kwargs)
+        self.tags.set(Tag.from_string(self._tags_string), clear=True)
 
     def __str__(self):
         return f"[{self.id}; {self.owner.username}] {self.location} :: {self.title}"
