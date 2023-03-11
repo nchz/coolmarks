@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from links.models import Link, Tag
+from core.models import Link, Tag
 
 
 class LinkTagsInline(admin.TabularInline):

@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     # "allauth.socialaccount.providers.google",
     # Project apps.
-    "links",
+    "core",
 ]
 
 MIDDLEWARE = [

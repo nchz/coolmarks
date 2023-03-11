@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from links.models import Link, Tag
+from core.models import Link, Tag
 
 
 class CustomSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,10 +31,9 @@ class LinkSerializer(CustomSerializer):
         ]
 
     def to_internal_value(self, data):
-        data = dict(data)  # Avoid errors in Browsable API.
-        tag_list = data.pop("tag_list", [])
         value = super().to_internal_value(data)
-        value["tags"] = Tag.from_list(tag_list)
+        if (tag_list := data.get("tag_list")) is not None:
+            value["tags"] = Tag.from_list(tag_list)
         return value
 
 

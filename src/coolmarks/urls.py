@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 
 from coolmarks.views import status_view
-from links.views import UserViewSet, LinkViewSet, TagViewSet
+from core.views import UserViewSet, LinkViewSet, TagViewSet
 
 
 router = DefaultRouter()

@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from links.serializers import UserSerializer, LinkSerializer, TagSerializer
+from core.serializers import UserSerializer, LinkSerializer, TagSerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -16,7 +16,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return TagSerializer.Meta.model.objects.filter(link__owner=self.request.user)
+        model = TagSerializer.Meta.model
+        return model.objects.filter(link__owner=self.request.user).distinct()
 
 
 class LinkViewSet(viewsets.ModelViewSet):
