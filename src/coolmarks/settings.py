@@ -10,6 +10,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 SECRET_KEY = "($39x(vd=1$1uc%nzq7!xrd*$uz0+0v*qsy2+3&oc&9#8q@^k3"
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = [
+    "chrome-extension://akmmjffnhjjcmaljijffnllflkbpofle",
+]
 
 
 STATIC_URL = "/static/"
@@ -20,16 +23,16 @@ LOGIN_URL = "/auth/login/"
 LOGIN_REDIRECT_URL = "/links/"
 LOGOUT_REDIRECT_URL = "/"
 
-# used by allauth.
+# Used by allauth.
 SITE_ID = 1
 ACCOUNT_LOGOUT_ON_GET = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# TODO check if actually needed.
-# AUTHENTICATION_BACKENDS = (
+# TODO Check if actually needed.
+# AUTHENTICATION_BACKENDS = [
 #     "django.contrib.auth.backends.ModelBackend",
 #     "allauth.account.auth_backends.AuthenticationBackend",
-# )
+# ]
 
 
 # Application definition
@@ -41,12 +44,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # dependencies.
+    # Dependencies.
+    "rest_framework",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     # "allauth.socialaccount.providers.google",
-    # project apps.
+    # Project apps.
     "links",
 ]
 
@@ -115,7 +119,19 @@ USE_I18N = True
 USE_TZ = True
 
 
-# production settings.
+# Extension specific.
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": None,
+    "DEFAULT_RENDERER_CLASSES": [
+        # "rest_framework.renderers.TemplateHTMLRenderer",
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+}
+
+
+# Production settings.
 
 if os.getenv("RR_ENV") == "prod":
     DEBUG = False

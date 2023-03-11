@@ -1,14 +1,14 @@
-from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from coolmarks import settings
 
 
+@api_view()
 @ensure_csrf_cookie
-@require_http_methods(["GET"])
 def status_view(request):
-    return JsonResponse(
+    return Response(
         {
             "debug": settings.DEBUG,
             "authenticated": request.user.is_authenticated,

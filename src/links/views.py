@@ -1,172 +1,41 @@
-from http import HTTPStatus
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-import json
-from urllib.parse import urlparse
-
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-
-from links.models import Link, Tag
+from links.serializers import UserSerializer, LinkSerializer, TagSerializer
 
 
-@login_required
-@require_http_methods(["GET"])
-def list_view(request):
-    """
-    List `request.user` links.
-    """
-    link_list = Link.objects.filter(owner=request.user).order_by("-dt")
-    context = {
-        "link_list": link_list,
-    }
-    return render(request, "links/index.html", context)
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = UserSerializer.Meta.model.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 
-@login_required
-@require_http_methods(["POST"])
-def add_view(request):
-    """
-    Create a new `Link` for `request.user`.
-    """
-    data = json.loads(request.body)
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    if "location" not in data:
-        return HttpResponseBadRequest()
-
-    location = data["location"]
-    link = Link.objects.filter(owner=request.user, location=location).first()
-
-    if not link:
-        title = data["title"]
-        # favicon_url = data["favIconUrl"]
-        _tags_string = data.get("_tags_string", "")
-
-        link = Link(
-            owner=request.user,
-            location=location,
-            title=title,
-            # favicon_url=favicon_url,
-        )
-        link._tags_string = _tags_string
-        link.save()
-        response = {
-            "message": "Link created.",
-        }
-        status_code = HTTPStatus.CREATED
-
-    else:
-        response = {
-            "message": "Link already exists.",
-        }
-        status_code = HTTPStatus.CONFLICT
-
-    # return HttpResponseRedirect(reverse("links:list"))
-    return JsonResponse(response, status=status_code)
+    def get_queryset(self):
+        return TagSerializer.Meta.model.objects.filter(link__owner=self.request.user)
 
 
-@login_required
-@require_http_methods(["POST"])
-def delete_view(request):
-    """
-    Delete links whose ids are in the requested list.
-    """
-    data = json.loads(request.body)
+class LinkViewSet(viewsets.ModelViewSet):
+    serializer_class = LinkSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    link_ids = [int(i) for i in data.get("link_ids", "").split(",") if i != ""]
-    objs = Link.objects.filter(
-        pk__in=link_ids,
-        owner=request.user,
-    )
-    objs.delete()
-    response = {
-        "message": "Links deleted.",
-    }
+    def get_queryset(self):
+        return self.request.user.link_set.all()
 
-    # return HttpResponseRedirect(reverse("links:list"))
-    return JsonResponse(response)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
-
-@login_required
-@require_http_methods(["POST"])
-def edit_view(request):
-    """
-    Perform the requested action on the links whose ids are in the requested list.
-    """
-    data = json.loads(request.body)
-
-    link_ids = [int(i) for i in data.get("link_ids", "").split(",") if i != ""]
-    action = data.get("action")
-    _tags_string = data.get("_tags_string", "")
-
-    tags = Tag.from_string(_tags_string)
-    if action == "set":
-        tags = [tags]
-
-    objs = Link.objects.filter(
-        pk__in=link_ids,
-        owner=request.user,
-    )
-    for o in objs:
-        getattr(o.tags, action)(*tags)
-
-    # return HttpResponseRedirect(reverse("links:list"))
-    return JsonResponse({})
-
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def bulk_add_view(request):
-    data = json.loads(request.body)
-
-    if request.method == "GET":
-        return render(request, "links/bulk.html")
-
-    elif request.method == "POST":
-        if "location_list" not in data:
-            return HttpResponseBadRequest()
-
-        location_list = data["location_list"]
-        _tags_string = data.get("_tags_string", "")
-
-        locations = [loc.strip() for loc in location_list.split() if loc.strip()]
-        for location in locations:
-            parsed_loc = urlparse(location)
-            if parsed_loc.scheme and parsed_loc.netloc:
-                link = Link(
-                    owner=request.user,
-                    location=location,
-                )
-                link._tags_string = _tags_string
-                link.save()
-
-        return HttpResponseRedirect(reverse("links:list"))
-
-
-@csrf_exempt
-@login_required
-@require_http_methods(["POST"])
-def check_view(request):
-    """
-    Check if the requested location is in the `request.user` links.
-    """
-    data = json.loads(request.body)
-
-    location = data["location"]
-    try:
-        link = Link.objects.get(
-            location=location,
-            owner=request.user,
-        )
-        result = {
-            "link_id": link.id,
-        }
-    except Link.DoesNotExist:
-        result = {
-            "link_id": None,
-        }
-
-    return JsonResponse(result)
+    @action(methods=["POST"], detail=False)
+    def check(self, request):
+        """
+        Look for the requested `location` in the user's links. Return a list
+        with at most one element, the representation of the (found) link.
+        """
+        location = request.data.get("location")
+        links = self.get_queryset().filter(location=location)
+        links = self.get_serializer(links, many=True)
+        return Response(links.data)
